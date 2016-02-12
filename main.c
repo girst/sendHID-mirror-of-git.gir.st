@@ -86,7 +86,7 @@ fclose (hid_dev);
 			}
 		} else {
 			//key does not exist in this layout, use unicode method
-			fprintf (stderr, "Warning: Key '%s'(0x%x) not in this layout!\n", s->sym, s->unicode);
+			//fprintf (stderr, "Warning: Key '%s'(0x%x) not in this layout!\n", s->sym, s->unicode);
 			send_unicode (hid_dev, s->unicode, atoi (argv[P_UNI]), atoi(argv[P_LAY]));
 		}
 	}
@@ -123,7 +123,6 @@ enum errors send_unicode (FILE* hid_dev, unsigned int unicode, enum uni_m method
 		break;
 	case GTK_HOLD:
 		sprintf (buf, "%x", unicode);
-		fprintf (stderr, "attempting to send: %s", buf);
 		s = toscan ("u");
 		l = tolay (s, layout);
 		send_key (hid_dev, l->key, MOD_LCTRL | MOD_LSHIFT);
@@ -136,7 +135,6 @@ enum errors send_unicode (FILE* hid_dev, unsigned int unicode, enum uni_m method
 		break;
 	case GTK_SPACE:
 		sprintf (buf, "%x ", unicode);
-		fprintf (stderr, "attempting to send: %s", buf);
 		s = toscan ("u");
 		l = tolay (s, layout);
 		send_key (hid_dev, l->key, MOD_LCTRL | MOD_LSHIFT);

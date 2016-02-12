@@ -11,20 +11,42 @@ parameters:
 #include <string.h>
 #include "scancodes.h"
 
-//argv-indices
-#define P_EXE 0 //executable name
-#define P_DEV 1 //device file
-#define P_LAY 2 //layout
-#define P_UNI 3//unicode method
-#define P_STR 4 //string to type
-#define NUM_P P_STR+1 //number of parameters
+enum params = {//argv-indices:
+	P_EXE, //executable name
+	P_DEV, //device file
+	P_LAY, //layout
+	P_UNI, //unicode method
+	P_STR, //string to type
+	NUM_P  //number of parameters
+};
+enum kbdl = {  //keyboard layouts:
+	na_NA, //reserved
+	en_US, 
+	de_AT,
+	de_ND //de_AT-nodeadkeys
+};
+enum uni_m = {//unicode methods:
+	SKIP, //ignore any keys not on the layout
+	GTK_HOLD, //hold ctrl and shift while entering hex values
+	GTK_SPACE, //end hex sequence with spacebar
+	WINDOWS //use alt+numpad
+};
+enum errors = {
+	ERR_SUCCESS, //no error
+	ERR_ARGCOUNT, //wrong number of arguments
+	ERR_SYMBOL, //symbol not in look up table
+	ERR_LAYOUT, //parameter P_LAY does not contain a correct keyboard layout
+	ERR_LAZY //i haven't done this
+};
 
 void send_key (FILE* hid_dev, unsigned short key, unsigned short mod);
+struct layout* tolay (struct keysym* s, enum kbdl layout);
+enum errors send_unicode (FILE* hid_dev, unsigned int unicode, enum uni_m method, enum kbdl layout);
 
 int main (int argc, char** argv) {
 	if (argc != NUM_P) {
 		fprintf (stderr, "Usage: %s <device file> <layout> <unicode> \"<string>\"\n", argv[P_EXE]);
-		return 1;
+		return ERR_ARGCOUNT;
 	}
 	FILE* hid_dev = fopen ("/dev/hidg0", "w");
 	for (int i = 0; i < strlen (argv[P_STR]); i++) {
@@ -45,52 +67,14 @@ int main (int argc, char** argv) {
 		struct keysym* s = toscan (tmp);
 		if (s == NULL) {
 			fprintf (stderr, "Key Symbol not found.\n");
-			return 1;
+			return ERR_SYMBOL;
 		}
-		struct layout* l;
-		int ignore_deadkey = 0;
-		switch (atoi (argv[P_LAY])) {
-		case 0:
-			fprintf (stderr, "This keyboard layout is reserved.\n");
-			return 1;
-		case 1: //en_us
-			l = &(s->en_us);
-			break;
-		case 2: //de_at
-			l = &(s->de_at);
-			break;
-		case 3: //de_at-nodeadkeys
-			l = &(s->de_at);
-			ignore_deadkey = 1;
-			break;
-		default:
+		struct layout* l = tolay (s, atoi (argv[P_LAY]));
+		if (l == NULL) {
 			fprintf (stderr, "Unrecognised keyboard layout.\n");
-			return 1;
+			return ERR_LAYOUT;
 		}
-		if (l->key == 0x00) {
-			//key does not exist in this layout
-			fprintf (stderr, "Key not in this layout!\n");
-			/*TODO: send unicode sequence
-			  there are different methods to be used for gtk and
-			  winblows. ctrl-shift-u-HEX vs. ctrl-shift-u,HEX,SPACE
-			  vs. alt+NUMPAD vs. alt+'+'+HEX
-			*/
-			switch (atoi (argv[P_UNI])) {
-			case 0: //skip unicode character entry
-				break;
-			case 1: //gtk: hold ctrl and shift while entering
-				//TODO
-				break;
-			case 2: //gtk: use space as end marker for unicode
-				//TODO
-			case 3: //windows: alt+numpad (decimal)
-				//TODO
-				break;
-			default:
-				fprintf (stderr, "Unicode Method unknown!\n");
-				return 1;
-			}
-		} else {
+		if (l->key != 0x00) {
 			send_key(hid_dev, l->key, l->mod);
 			send_key(hid_dev, '\0', '\0'); //release all keys
 			if (l->is_dead && !ignore_deadkey) {
@@ -98,13 +82,79 @@ int main (int argc, char** argv) {
 				send_key(hid_dev, l->key, l->mod);
 				send_key(hid_dev, '\0', '\0'); //release all keys
 			}
+		} else {
+			//key does not exist in this layout, use unicode method
+			fprintf (stderr, "Warning: Key not in this layout!\n");
+			send_unicode (s-> unicode, atoi (argv[P_UNI]);
 		}
 	}
 	fclose (hid_dev);
 
-	return 0;
+	return ERR_SUCCESS;
 }
+
+struct layout* get_layout (struct keysym* s, enum kbdl layout) {
+	switch (layout) {
+	case na_NA:
+		fprintf (stderr, "This keyboard layout is reserved.\n");
+		return NULL;
+	case en_US:
+		return &(s->en_us);
+	case de_AT:
+		return &(s->de_at);
+	case de_ND:
+		return &(s->de_at);
+	default:
+		fprintf (stderr, "Unrecognised keyboard layout.\n");
+		return NULL;
+	}
 
 void send_key (FILE* hid_dev, unsigned short key, unsigned short mod) {
 	fprintf (hid_dev, "%c%c%c%c%c%c%c%c", mod, '\0', key, '\0', '\0', '\0', '\0', '\0');
+}
+
+struct layout* tolay (struct keysym* s, enum kbdl layout) {
+	switch (layout) {
+	case en_US: return &(s->en_us);
+	case de_AT: return &(s->de_at);
+	case de_ND: return &(s->de_nd);
+	default: return NULL;
+	}
+}
+
+enum errors send_unicode (FILE* hid_dev, unsigned int unicode, enum uni_m method, enum kbdl layout) {
+	char buf[10];
+	struct keysym* s;
+	struct layout* l;
+
+	if (unicode == 0x00) {
+		printf ("Symbol not in lookup table!\n");
+		return ERR_SYMBOL;
+	}
+
+	switch (method) {
+	case SKIP:
+		break;
+	case GTK_HOLD:
+		fprintf ("Hold-down X11 not implemented!\n");
+		return ERR_LAZY;
+	case GTK_SPACE:
+		sprintf (string, "%x", unicode);
+		s = toscan ("u");
+		l = tolay (s, layout);
+		send_key (hid_dev, l->key, MOD_LCTRL | MOD_LSHIFT);
+		for (int i = 0; i < strlen (string); i++) {
+			s = toscan (string);
+			l = tolay (s, layout);
+			send_key (hid_dev, l->key, MOD_LCTRL | MOD_LSHIFT);
+		}
+		send_key (hid_dev, '\0', '\0');
+		break;
+	case WINDOWS:
+		fprintf ("windows method not implemented!\n");
+		return ERR_LAZY;
+	default:
+		fprintf ("unknown unicode method!\n");
+		return ERR_LAYOUT; //TODO: better error code
+	}
 }

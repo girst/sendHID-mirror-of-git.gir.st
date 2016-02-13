@@ -3,8 +3,8 @@
 git clone https://git.zx2c4.com/password-store
 cd password-store/src
 tee pass-patch.diff <<-EOF
---- password-store.sh	2016-02-13 13:55:05.704497345 +0100
-+++ password-store-modified.sh	2016-02-13 14:02:17.412565405 +0100
+--- password-store.sh.orig	2016-02-13 21:27:16.133642142 +0100
++++ password-store.sh	2016-02-13 14:02:17.412565405 +0100
 @@ -324,7 +324,8 @@
  		else
  			echo "${path%\/}"

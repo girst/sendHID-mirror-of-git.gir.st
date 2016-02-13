@@ -40,7 +40,7 @@ ln -s functions/hid.$N configs/c.$C/
 ls /sys/class/udc > UDC
 ```
 
-## modifiing `pass`
+## modifying `pass`
 The version of (pass)[https://passwordstore.org] doesn't format the output as nice, so it is easier to work with. Using the `pass-installer.sh` will automatically clone from the original repository, apply the patch and install it (make sure, `patch` and `sudo` is installed). 
 
 You can then check out `hardpass-demo.sh` to see how to supply a passphrase directly from the command line (without gpg-agent). Keep in mind, that it will show up in your history file!

@@ -19,12 +19,6 @@ enum params {//argv-indices:
 	P_STR, //string to type
 	NUM_P  //number of parameters
 };
-enum kbdl {  //keyboard layouts:
-	na_NA, //reserved
-	en_US, 
-	de_AT,
-	de_ND //de_AT-nodeadkeys
-};
 enum uni_m {//unicode methods:
 	SKIP, //ignore any keys not on the layout
 	GTK_HOLD, //hold ctrl and shift while entering hex values
@@ -40,7 +34,6 @@ enum errors {
 };
 
 void send_key (FILE* hid_dev, unsigned short key, unsigned short mod);
-struct layout* tolay (struct keysym* s, enum kbdl layout);
 enum errors send_unicode (FILE* hid_dev, unsigned int unicode, enum uni_m method, enum kbdl layout);
 
 int main (int argc, char** argv) {
@@ -97,15 +90,6 @@ fclose (hid_dev);
 
 void send_key (FILE* hid_dev, unsigned short key, unsigned short mod) {
 	fprintf (hid_dev, "%c%c%c%c%c%c%c%c", mod, '\0', key, '\0', '\0', '\0', '\0', '\0');
-}
-
-struct layout* tolay (struct keysym* s, enum kbdl layout) {
-	switch (layout) {
-	case en_US: return &(s->en_us);
-	case de_AT: return &(s->de_at);
-	case de_ND: return &(s->de_nd);
-	default: return NULL;
-	}
 }
 
 enum errors send_unicode (FILE* hid_dev, unsigned int unicode, enum uni_m method, enum kbdl layout) {

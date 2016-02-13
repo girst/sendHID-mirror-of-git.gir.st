@@ -122,3 +122,11 @@ struct keysym* toscan (const char* utf8) {
 	return NULL; // error
 }
 
+struct layout* tolay (struct keysym* s, enum kbdl layout) {
+        switch (layout) {
+        case en_US: return &(s->en_us);
+        case de_AT: return &(s->de_at);
+        case de_ND: return &(s->de_nd);
+        default: return NULL;
+        }
+}

@@ -8,6 +8,16 @@ I am using a Raspberry Pi Zero, since it has USB-OTG support and a lot of GPIO t
 The OLED I am intending to use has an I²C interface and a screen diagonal of .96". 
 
 ## using the driver
+The neccessary drivers are available only in the Raspbian 4.4 Kernel, which you can install using
+```
+sudo BRANCH=next rpi-update
+```
+You also need to activate the device tree overlay `dwc2` and load the corresponding kernel module:
+```
+echo "dtoverlay=dwc2" | sudo tee /boot/config.txt
+echo "dwc2" | sudo tee /etc/modules
+```
+
 To use this program, you have to enable the `libcomposite` driver on the Raspberry Pi and create a USB HID gadget. 
 You can use this bash script:
 ```

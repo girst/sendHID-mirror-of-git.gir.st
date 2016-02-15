@@ -11,6 +11,7 @@ parameters:
 #include <string.h>
 #include "scancodes.h"
 
+#define TEXT_LEN 256 //max length of piped text
 enum params {//argv-indices:
 	P_EXE, //executable name
 	P_DEV, //device file
@@ -42,8 +43,8 @@ int main (int argc, char** argv) {
 		return ERR_ARGCOUNT;
 	}
 	FILE* hid_dev = fopen ("/dev/hidg0", "w");
-	char in_string[256];
-	fgets(in_string, 256, stdin);
+	char in_string[TEXT_LEN];
+	fgets(in_string, TEXT_LEN, stdin);
 	for (int i = 0; i < strlen (in_string); i++) {
 
 		char tmp[UTF8_MAX_LENGTH] = {in_string[i], in_string[i+1], in_string[i+2], '\0'};

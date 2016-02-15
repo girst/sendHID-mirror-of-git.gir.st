@@ -46,6 +46,10 @@ int main (int argc, char** argv) {
 	char in_string[TEXT_LEN];
 	fgets(in_string, TEXT_LEN, stdin);
 	for (int i = 0; i < strlen (in_string); i++) {
+		if (in_string[i] < 32) {
+			fprintf (stderr, "Cannot print control characters!\n(Is there a newline at the end of your string?\n");
+			return ERR_SYMBOL;
+		}
 
 		char tmp[UTF8_MAX_LENGTH] = {in_string[i], in_string[i+1], in_string[i+2], '\0'};
 		//TODO: replace by something less stupid

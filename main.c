@@ -1,10 +1,11 @@
 /*
-description: sends a sequence of keystrokes to the hid device. 
+description: sends a sequence of keystrokes provided from stdin to the hid
+device. 
+stops typing at: control characters (including newline), chars not in table, EOF
 parameters:
 	device file (e.g. /dev/hidg0)
 	keyboard layout (1=en_us, 2=de_at, 3=de_at-nodeadkeys)
 	unicode method: 1=gtk_holddown, 2=gtk_spaceend, 3=windows
-	the string to send (as whitespace is important, the `echo` way of concatenating all parameters is not supported. if your string has white space in it and you are in an interactive session, quote your string.)
 */
 #include <stdio.h>
 #include <stdlib.h>
@@ -40,6 +41,16 @@ int main (int argc, char** argv) {
 	if (argc != NUM_P) {
 		fprintf (stderr, "Usage: %s <device file> <layout> <unicode>\n", argv[P_EXE]);
 		fprintf (stderr, "Takes string to type from stdin\n");
+		fprintf (stderr, "<device file>:\ton the Raspberry Pi usually /dev/hidg0\n");
+		fprintf (stderr, "<layout>:\n\t%d\t%s\n\t%d\t%s\n\t%d\t%s\n", 
+			en_US, "en_US", 
+			de_AT, "de_AT (w/ dead keys)", 
+			de_ND, "de_AT-nodeadkeys");
+		fprintf (stderr, "<unicode>:\n\t%d\t%s\n\t%d\t%s\n\t%d\t%s\n\t%d\t%s\n", 
+			SKIP, "skip over unicode characters", 
+			GTK_HOLD, "X11 Holddown: CTRL+SHIFT+[u, hex]",
+			GTK_SPACE, "X11 Space: CTRL+SHIFT+u, hex, SPACE",
+			WINDOWS, "Windows: Alt+[Numpad]");
 		return ERR_ARGCOUNT;
 	}
 	FILE* hid_dev = fopen ("/dev/hidg0", "w");

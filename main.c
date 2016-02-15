@@ -16,7 +16,6 @@ enum params {//argv-indices:
 	P_DEV, //device file
 	P_LAY, //layout
 	P_UNI, //unicode method
-	P_STR, //string to type
 	NUM_P  //number of parameters
 };
 enum uni_m {//unicode methods:
@@ -38,18 +37,21 @@ enum errors send_unicode (FILE* hid_dev, unsigned int unicode, enum uni_m method
 
 int main (int argc, char** argv) {
 	if (argc != NUM_P) {
-		fprintf (stderr, "Usage: %s <device file> <layout> <unicode> \"<string>\"\n", argv[P_EXE]);
+		fprintf (stderr, "Usage: %s <device file> <layout> <unicode>\n", argv[P_EXE]);
+		fprintf (stderr, "Takes string to type from stdin\n");
 		return ERR_ARGCOUNT;
 	}
 	FILE* hid_dev = fopen ("/dev/hidg0", "w");
-	for (int i = 0; i < strlen (argv[P_STR]); i++) {
+	char in_string[256];
+	fgets(in_string, 256, stdin);
+	for (int i = 0; i < strlen (in_string); i++) {
 
-		char tmp[UTF8_MAX_LENGTH] = {argv[P_STR][i], argv[P_STR][i+1], argv[P_STR][i+2], '\0'};
+		char tmp[UTF8_MAX_LENGTH] = {in_string[i], in_string[i+1], in_string[i+2], '\0'};
 		//TODO: replace by something less stupid
-		if (argv[P_STR][i] < 128) { // not multi byte
+		if (in_string[i] < 128) { // not multi byte
 			tmp[1] = '\0';
 		} else { // is multi byte
-			if (argv[P_STR][i] < 0xe0) {
+			if (in_string[i] < 0xe0) {
 			i++; //skip next thing
 			tmp[2] = 0;
 			} else {

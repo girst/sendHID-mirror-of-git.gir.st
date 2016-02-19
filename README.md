@@ -79,6 +79,7 @@ enum kbdl {  //keyboard layouts:
 ```
 3. in `scancodes.c` you need to add a new column (containing more columns) to the big `keysyms[]` table:
 It is suggested to explicitly name `.is_dead` and `.unicode` to avoid confusion. Also notice that `.is_dead` is part of the layout (and goes within the inner braces), while `.unicode` resides in the keysym-struct. 
+if you want to add new keys, the following must be kept in mind: `toscan()` will use the nth line of the table, if n is larger than 32 (aka. will use the ascii code to look up chars). symbols not in the 7-bit ascii standard can be put on the first 32 positions as utf-8 encoded strings, although keeping [0] to the release all chars is recommended. (some text editors will convert files to older encodings - this might break things)
 ```
 struct keysym keysyms[] = {
 	//...

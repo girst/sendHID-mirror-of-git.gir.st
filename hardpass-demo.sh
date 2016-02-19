@@ -2,14 +2,11 @@
 
 # this is a demo that fetches a password from the password store (must be initialized) and types it over the usb-hid interface to the host computer. 
 # see github.com/girst/hardpass -> readme for how to initialize the driver. 
+# since 471f0ed text to type is read from stdin instead of the last parameter!
 
- sudo ./scan /dev/hidg0 2 2 $(PASSWORD_STORE_GPG_OPTS="--passphrase 123456789" pass show github.com/girst|head -n 1)
-#`--´ `----´ `--------´ ^ ^                                         `-------´           `--------------´ `-------´
-#  |     |       |      | |                                             |                       |            |
-#  |     |       |      | |                                             |                       |            '>make sure to only fetch the first line (containing the password)
-#  |     |       |      | |'>unicode method                             '>demo password         '>passwordstore-entry
-#  |     |       |      '>keyboard layout
-#  |     |       '>device file created by the libcomposite driver
-#  |     '>name of the executable i wrote
-#  '>device file access needs root permissions (or chmodding)
-
+PASSWORD_STORE_GPG_OPTS="--passphrase 123456789" pass show github.com/girst | head -n 1 | sudo ./scan /dev/hidg0 2 2
+#                                     `-------´            `--------------´   `-------´        `----´ `--------´ ^ ^
+#                                      '>demo password      '>pass-entry       | get only       |      |         | '>unicode method
+#                                                                              '>first line     |      |         '>keyboard layout
+#                                                                                               |      '>device file of hid-gadget
+#                                                                                               '>name of executable

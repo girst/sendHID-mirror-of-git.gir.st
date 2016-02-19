@@ -14,8 +14,8 @@ sudo BRANCH=next rpi-update
 ```
 You also need to activate the device tree overlay `dwc2` and load the corresponding kernel module:
 ```
-echo "dtoverlay=dwc2" | sudo tee /boot/config.txt
-echo "dwc2" | sudo tee /etc/modules
+echo "dtoverlay=dwc2" | sudo tee -a /boot/config.txt
+echo "dwc2" | sudo tee -a /etc/modules
 ```
 
 To use this program, you have to enable the `libcomposite` driver on the Raspberry Pi and create a USB HID gadget. 

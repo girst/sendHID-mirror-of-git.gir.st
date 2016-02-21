@@ -1,4 +1,5 @@
 #!/bin/bash
+# (C) 2016 Tobias Girstmair, released under the GNU GPL
 
 git clone https://git.zx2c4.com/password-store
 cd password-store/src

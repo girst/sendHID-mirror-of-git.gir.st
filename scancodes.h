@@ -1,3 +1,4 @@
+// (C) 2016 Tobias Girstmair, released under the GNU GPL
 #ifndef __SCANCODES_H__
 #define __SCANCODES_H__
 

@@ -1,4 +1,5 @@
 #!/bin/bash
+# (C) 2016 Tobias Girstmair, released under the GNU GPL
 
 # this is a demo that fetches a password from the password store (must be initialized) and types it over the usb-hid interface to the host computer. 
 # see github.com/girst/hardpass -> readme for how to initialize the driver. 

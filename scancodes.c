@@ -1,3 +1,4 @@
+// (C) 2016 Tobias Girstmair, released under the GNU GPL
 #include <string.h>
 #include "scancodes.h"
 

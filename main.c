@@ -1,4 +1,6 @@
 /*
+(C) 2016 Tobias Girstmair, released under the GNU GPL
+
 description: sends a sequence of keystrokes provided from stdin to the hid
 device. 
 stops typing at: control characters (including newline), chars not in table, EOF

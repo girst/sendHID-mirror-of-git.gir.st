@@ -55,7 +55,7 @@ int main (int argc, char** argv) {
 			WINDOWS, "Windows: Alt+[Numpad]");
 		return ERR_ARGCOUNT;
 	}
-	FILE* hid_dev = fopen ("/dev/hidg0", "w");
+	FILE* hid_dev = fopen (argv[P_DEV], "w");
 	char in_string[TEXT_LEN];
 	fgets(in_string, TEXT_LEN, stdin);
 	for (int i = 0; i < strlen (in_string); i++) {

@@ -1,19 +1,19 @@
 # hardpass
 A hardware password manager, built around a Paspberry Pi Zero and [`pass`, the UNIX password manager](https://passwordstore.org).
 
-This is also an entry for [Hackaday.io](https://hackaday.io)'s Pi Zero Contest. 
+This project is now maintained at [this repository](https://github.com/girst/hardpass-passwordmanager). 
 
-This repo shall also provide code for your own hid-gadgets - the code is meant to be easy to change to suit your needs. 
+# sendHID
 
-## Hardware
-I am using a Raspberry Pi Zero, since it has USB-OTG support and a lot of GPIO to interface an OLED screen, a button matrix for input and maybe even an ESP8266 for WiFi. 
-The OLED I am intending to use has an I²C interface and a screen diagonal of .96". 
+sendHID is a tool to simulate typing using the Linux USB Gadget mode. 
+
+Use a Raspberry Pi Zero (or A) to send keystrokes to a host computer. 
 
 ## using the driver
-The neccessary drivers are available only in the Raspbian 4.4 Kernel, which you can install using
-```
-sudo BRANCH=next rpi-update
-```
+There are two drivers available: the legacy `g_hid` driver, which has windows support, and the new `libcomposite`, which makes emulation of multiple devices at the same time very easy. Setup instructions on the latter are below. 
+
+The neccessary drivers are available only in the Raspbian 4.4 Kernel, which you can install using `sudo BRANCH=next rpi-update`, if you haven't updated you Pi in a long time. 
+
 You also need to activate the device tree overlay `dwc2` and load the corresponding kernel module:
 ```
 echo "dtoverlay=dwc2" | sudo tee -a /boot/config.txt
@@ -52,13 +52,33 @@ ln -s functions/hid.$N configs/c.$C/
 ls /sys/class/udc > UDC
 ```
 
-## modifying `pass`
-The version of (pass)[https://passwordstore.org] doesn't format the output as nice, so it is easier to work with. Using the `pass-installer.sh` will automatically clone from the original repository, apply the patch and install it (make sure, `patch` and `sudo` is installed). 
-
-You can then check out `hardpass-demo.sh` to see how to supply a passphrase directly from the command line (without gpg-agent). Keep in mind, that it will show up in your history file!
-
 ## internals of this code
 whenever you need to add (or remove) a new keyboard layout, the following changes have to be made:
+
+### adding a new key to existing layouts
+
+1. if the key is on the keyboard, just add a new line, and use the keycode ("Usage ID (Hex)") from the table 12 on page 53pp of the [_USB HID Usage Tables_](http://www.usb.org/developers/hidpage/Hut1_12v2.pdf) document. 
+
+Following the keycode comes the modifier bit mask. `0x02` is Shift, `0x40` AltGraph. 
+
+Now an example adding the letter A:
+
+```
+{"A",  //character to translate
+	{ //english layout
+		0x04, //keycode
+		0x02  //shift
+	}, { //german layout
+		0x04, //keycode
+		0x02  //shift
+	}, { //german-nodeadkeys
+		0x04, //keycode
+		0x02  //shift
+	}
+}
+```
+
+2. if it isn't on the keyboard, fill keyocde and modifier bit mask with `0x00` for the layout and use the `.unicode=0xXXXX` (See point 3 in the 'adding a new layout' section below). 
 
 ### adding a new keyboard layout (example)
 1. in `scancodes.h` add the layout to `keysym`-struct:

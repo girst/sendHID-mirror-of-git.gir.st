@@ -1,5 +1,5 @@
 # hardpass
-A hardware password manager, built around a Paspberry Pi Zero and [`pass`, the UNIX password manager](https://passwordstore.org).
+A hardware password manager, built around a Raspberry Pi Zero and [`pass`, the UNIX password manager](https://passwordstore.org).
 
 This project is now maintained at [this repository](https://github.com/girst/hardpass-passwordmanager). 
 
@@ -57,7 +57,7 @@ whenever you need to add (or remove) a new keyboard layout, the following change
 
 ### adding a new key to existing layouts
 
-1. if the key is on the keyboard, just add a new line, and use the keycode ("Usage ID (Hex)") from the table 12 on page 53pp of the [_USB HID Usage Tables_](http://www.usb.org/developers/hidpage/Hut1_12v2.pdf) document. 
+1. if the key is on the keyboard, just add a new line, and use the keycode ("Usage ID (Hex)") from the table 12 on page 53pp of the [_USB HID Usage Tables_](https://www.usb.org/sites/default/files/documents/hut1_12v2.pdf) document. 
 
 Following the keycode comes the modifier bit mask. `0x02` is Shift, `0x40` AltGraph. 
 
